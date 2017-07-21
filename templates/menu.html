@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <style>
+        .hide{
+            display: none;
+        }
+        .active{
+            color: red;
+        }
+        .menu-body{
+            margin-left: 20px;
+        }
+        .menu-body a{
+            display: block;
+        }
+    </style>
+</head>
+<body>
+   {{ menu_html|safe }}
+</body>
+<script src="/static/jquery-3.2.1.js"></script>
+<script>
+    $(function(){
+        $('.menu-header').click(function(){
+            $(this).next().removeClass('hide').parent().siblings().find('.menu-body').addClass('hide');
+        })
+    })
+</script>
+</html>

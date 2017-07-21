@@ -10,7 +10,7 @@ from django.db.models import F
 from utils.comment import comment_tree
 from utils.xss import xss
 
-#主页面     
+#主页面
 def index(request,*args,**kwargs):
     # 获取当前URL
     # print(request.path_info)
@@ -413,7 +413,6 @@ def new_article(request):
         # content=request.POST.get('content')
         # global CONTENT
         # CONTENT = content
-        print('dddddd')
         if obj.is_valid():
             article_list=obj.cleaned_data
             print(article_list)
