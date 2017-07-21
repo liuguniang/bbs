@@ -1,0 +1,83 @@
+{% extends 'layout.html' %}
+
+{% block css %}
+
+    <link rel="stylesheet" href="/static/css/theme/{{ dict.blog.theme }}.css">
+{% endblock %}
+{% block header %}
+  <div class="container theme">
+    <!-- Brand and toggle get grouped for better mobile display -->
+    <div class="navbar-header ">
+      <a class="navbar-brand" href="#">{{ dict.blog.title }}</a>
+    </div>
+
+    <!-- Collect the nav links, forms, and other content for toggling -->
+    <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+          <div class="userinfo right" style="line-height: 48px">
+             <a href="/">首页</a>
+             <a href="#">个人首页</a>
+             <a href="#">管理</a>
+         </div>
+
+    </div><!-- /.navbar-collapse -->
+  </div><!-- /.container-fluid -->
+{% endblock %}
+{% block nav %}
+         <div>
+      公告
+         <ul>
+            <li>昵称:{{ dict.user_list.nickname }}</li>
+             <li><a href="">粉丝:{{ dict.fans_count.0.xx }}</a></li>
+             <li><a href="">关注:{{ dict.focus_count.0.xx }}</a></li>
+             <li>邮箱:{{ dict.user_list.email }}</li>
+         </ul>
+      标签
+         <ul>
+              {% for key in dict.tag_dict %}
+                     <li><a href="{% url 'filter' dict.blog.site 'tag' key.tag_id %}">{{ key.tag__tag }}({{ key.xx }})</a></li>
+             {% endfor %}
+         </ul>
+      分类
+         <ul>
+            {% for k in dict.classfiy_dict %}
+               <li><a href="{% url 'filter' dict.blog.site 'classfiy' k.classfiy__id %}">{{ k.classfiy__classfiy }}({{ k.xx }})</a></li>
+            {% endfor %}
+         </ul>
+      时间
+         <ul>
+            {% for k in dict.date_list %}
+                <li><a href="{% url 'filter' dict.blog.site 'datetime' k.month %}">{{ k.month }}({{ k.num }})</a></li>
+            {% endfor %}
+         </ul>
+     </div>
+{% endblock %}
+{% block content %}
+         <div>
+         {% for article in all_article_list %}
+         <div class="article">
+             <div class="art-header">
+                 <a href="{% url 'article' dict.blog.site  article.aid %}">{{ article.title }}</a>
+             </div>
+             <div class="art-body clearfix">
+                 <a class="left"><img style=" width:70px; height:70px;" src={{ article.blog.user.avator }} ></a>
+                 <a href="{% url 'article' dict.blog.site article.aid %}">{{ article.summary }}</a>
+             </div>
+             <div class="art-footer">
+                 <span>{{ article.create_time }}</span>
+                 <span>阅读 {{ article.read_count }}</span>
+                 <span>评论 {{ article.comment_count }}</span>
+                 <a href="#" >编辑</a>
+
+             </div>
+         </div>
+         {% endfor %}
+         <nav aria-label="Page navigation">
+            <ul class="pagination">
+            {{ page_info.pager|safe}}
+            </ul>
+         </nav>
+     </div>
+{% endblock %}
+
+
+

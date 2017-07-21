@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<form action="/new_article.html" method="post" novalidate>
+     {% csrf_token %}{{ obj.non_field_errors }}
+    <div>
+        文章标题
+{#        <input type="text" name="title">#}
+        {{ obj.title }}{{ obj.errors.title.0}}
+    </div>
+    <div>
+        文章内容
+{#        <textarea id="i1" name="content"></textarea>#}
+        {{ obj.content }}{{ obj.errors.content.0 }}
+    </div>
+类型
+    <div>{{ obj.type }}</div>{{ obj.errors.type.0 }}
+分类
+    {{ obj.classfiy }}{{ obj.errors.classfiy.0 }}
+标签
+    {{ obj.tag }}{{ obj.errors.tag.0 }}
+<div>
+    <input type="submit" value="提交">
+</div>
+
+</form>
+</body>
+<script src="/static/kindeditor-4.1.10/kindeditor-all.js"></script>
+<script>
+    KindEditor.create('#i1',{
+        width:'300px',
+        height:'200px',
+{#        items:['source','indent','bold','image','link']#}
+{#        filterMode:true,#}
+{#        htmlTags:{ span : ['.color', '.background-color' ]},#}
+{#        resizeType:2,#}
+{#        themeType:'default',#}
+{#        designMode:false,#}
+{#        noDisableItems:['source','bold']#}
+{#        自定义上传文件的名字，路径，额外的参数#}
+        filePostName:'fafafa',
+        uploadJson:'/upload_img.html',
+        extraFileUploadParams:{
+            'csrfmiddlewaretoken':'{{ csrf_token }}'
+        }
+    })
+</script>
+</html>

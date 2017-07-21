@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="stylesheet" href="/static/bootstrap-3.3.7-dist/css/bootstrap.css">
+    <style>
+        .register{
+            margin: 0 auto;
+            width: 600px;
+            margin-top: 250px;
+        }
+        #i1{
+            opacity:0;
+            left: 580px;
+            top: 200px;
+            position: absolute;
+            z-index: 1000;
+
+        }
+        #ifr{
+            display: none;
+        }
+        #avator{
+            opacity:1;
+            left: 575px;
+            top: 155px;
+            position: absolute;
+            z-index: 999;
+            width: 70px;
+            height:70px;
+            border-radius: 50%;
+        }
+        .avator_path{
+            display: none;
+        }
+        #avatar1{
+            width:70px;
+            height: 70px;
+            position: absolute;
+            margin-top: -40px;
+            margin-left: 20px;
+        }
+        #imgselect{
+            opacity: 0;
+        }
+
+    </style>
+</head>
+<body>
+<div class="register">
+    <form  id='f1' action="/register1/"  method="post" target="ifr" enctype="multipart/form-data" novalidate>
+        {% csrf_token %}
+        <iframe id="ifr" name="ifr"></iframe>
+        <input id='i1' type="file" onchange="uploadimg()" name="avator">
+        <img id='avator' src="/static/img/avatar.png">
+    </form>
+
+
+    <form class="form-horizontal" id='submit_form' method="post" action="/register/" novalidate enctype="multipart/form-data">
+        {% csrf_token %}
+        <div>
+            <img id='avatar1' src="/static/img/avatar.png" >
+{#            <input type="file" id="imgselect">#}
+            {{ obj.avator }}{{ obj.errors.avator.0 }}
+        </div>
+
+
+      <div class="form-group">
+        <label  class="col-sm-2 control-label">用户名</label>
+        <div class="col-sm-8">
+          {{ obj.username }}{{ obj.errors.username.0 }}
+        </div>
+      </div>
+      <div class="form-group">
+        <label  class="col-sm-2 control-label">密码</label>
+        <div class="col-sm-8">
+          {{ obj.password }}{{ obj.errors.password.0 }}
+        </div>
+      </div>
+        <div class="form-group">
+        <label  class="col-sm-2 control-label">确认密码</label>
+        <div class="col-sm-8">
+          {{ obj.password2 }}{{ obj.errors.password2.0 }}
+{#            公共的错误信息#}{{ obj.non_field_errors }}
+
+        </div>
+      </div>
+        <div class="form-group">
+        <label  class="col-sm-2 control-label">昵称</label>
+        <div class="col-sm-8">
+          {{ obj.nickname }}{{ obj.errors.nickname.0 }}
+        </div>
+      </div>
+        <div class="form-group">
+        <label  class="col-sm-2 control-label">邮箱</label>
+        <div class="col-sm-8">
+          {{ obj.email }}{{ obj.errors.email.0 }}
+        </div>
+      </div>
+        <div class="form-group">
+        <label  class="col-sm-2 control-label">验证码</label>
+        <div class="col-sm-4">
+          {{ obj.code }}{{ obj.errors.code.0 }}  {{ msg }}
+        </div>
+        <div class="col-sm-4">
+            <img src="/check_code/">
+        </div>
+      </div>
+      <div class="form-group">
+        <div class="col-sm-offset-2 col-sm-10">
+          <div class="checkbox">
+            <label>
+              <input type="checkbox"> Remember me
+            </label>
+          </div>
+        </div>
+      </div>
+      <div class="form-group">
+        <div class="col-sm-offset-2 col-sm-10">
+          <button type="submit" class="btn btn-default">提交</button>  {{ msg }}
+        </div>
+      </div>
+    </form>
+</div>
+</body>
+<script src="/static/jquery-3.2.1.js"></script>
+<script>
+    //伪ajax上传文件
+    function uploadimg(){
+        document.getElementById('f1').submit();
+        document.getElementById('ifr').onload=ShowImg;
+    }
+    function ShowImg(){
+        var content=document.getElementById('ifr').contentWindow.document.body.innerText;
+        document.getElementById('avator').src='/'+content;
+        var tag=document.createElement('input');
+        console.log(content);
+        tag.name='avator_path';
+        tag.value='/'+content;
+        tag.style.display='none';
+        document.getElementById('submit_form').appendChild(tag)
+    }
+
+
+    $(function(){
+        bindAvatar()
+    });
+
+    function bindAvatar(){
+        if(window.URL.createObjectURL){
+            bindAvatar2();
+        }else if(window.FileReader){
+            bindAvatar3()
+        }else{
+            bindAvatar1()
+        }
+    }
+    //原生ajax上传文件
+    function bindAvatar1(){
+        $('#imgselect').change(function(){
+            var csrf=$('input[name="csrfmiddlewaretoken"]').val();
+
+            var formdata=new FormData();
+            formdata.append('avator',$(this)[0].files[0]);
+            formdata.append("csrfmiddlewaretoken",csrf);
+
+            var xhr=new XMLHttpRequest();
+            xhr.onreadystatechange=function () {
+                if (xhr.readyState==4){
+                    var file_path=xhr.responseText;
+                    document.getElementById('avatar1').src='/'+file_path;
+                }
+            };
+            xhr.open('POST','/register1/');
+            xhr.send(formdata)
+        })
+    }
+    //本地上传预览
+    function bindAvatar2() {
+        $('#imgselect').change(function(){
+            var obj=$(this)[0].files[0];
+
+            var v=window.URL.createObjectURL(obj);
+            $('#avatar1').attr('src',v);
+            $('#avatar1').load(function () {
+                window.URL.revokeObjectURL(v);
+            })
+        })
+    }
+
+    function bindAvatar3(){
+        var obj=$(this)[0].files[0];
+        var reader= new FileReader();
+        reader.onload=function (e) {
+            $('#avatar1').attr('src',this.result);
+        };
+        reader.readAsDataURL(obj);
+    }
+
+</script>
+</html>

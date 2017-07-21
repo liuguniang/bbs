@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<link rel="stylesheet" href="/static/css/index_help.css">
+<link rel="stylesheet" href="/static/bootstrap-3.3.7-dist/css/bootstrap.css">
+<link rel="stylesheet" href="/static/font-awesome-4.7.0/css/font-awesome.css">
+<body>
+<nav class="navbar navbar-default no-radio">
+  <div class="container">
+    <!-- Brand and toggle get grouped for better mobile display -->
+    <div class="navbar-header ">
+      <a class="navbar-brand" href="#">屌丝的技术博客</a>
+    </div>
+
+    <!-- Collect the nav links, forms, and other content for toggling -->
+    <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+      <ul class="nav navbar-nav">
+        {% if dict.type_id %}
+            <li><a href="/">全部<span class="sr-only">(current)</span></a></li>
+        {% else %}
+            <li class="active"><a href="/">全部<span class="sr-only">(current)</span></a></li>
+        {% endif %}
+
+          {% for foo in dict.type_chioce %}
+              {% if foo.0 == type_id %}
+                  <li class="active"><a href="/all/{{ foo.0 }}/">{{ foo.1 }}</a></li>
+              {% else %}
+                  <li><a href="/all/{{ foo.0 }}/">{{ foo.1 }}</a></li>
+              {% endif %}
+          {% endfor %}
+      </ul>
+      {% if dict.username %}
+          <div class="userinfo right" style="line-height: 48px">
+             <a href=""><img style="width:20px;height:20px;border-radius: 50%;" src={{ dict.avator.0}} ></a>
+             <a href="#">{{ dict.username }}</a>
+             <a href="#">我的博客</a>
+             <a href="#">管理</a>
+             <a href="/exit/">退出</a>
+         </div>
+
+      {% else %}
+      <ul class="nav navbar-nav navbar-right">
+        <li><a href="/login/">登录</a></li>
+        <li><a href="/register/">注册</a></li>
+      </ul>
+    {% endif %}
+    </div><!-- /.navbar-collapse -->
+  </div><!-- /.container-fluid -->
+</nav>
+<div class="container">
+     <div class="col-md-8">
+         {% for article in dict.article_list %}
+         <div class="article">
+             <div class="art-header">
+                 <a href="{% url 'article' article.blog.site article.aid %}">{{ article.title }}</a>
+             </div>
+             <div class="art-body clearfix">
+                 <a class="left" href="{% url 'index' article.blog.site %}"><img src={{ article.blog.user.avator }} ></a>
+                 <a href="{% url 'article' article.blog.site article.aid %}">{{ article.summary }}</a>
+             </div>
+             <div class="art-footer">
+                 <a href="{% url 'index' article.blog.site %}" class="fa fa-user-o">{{ article.blog.user.nickname }}</a>
+                 <span>发布于{{ article.create_time }}</span>
+                 <span>阅读数 {{ article.read_count }}</span>
+                 <a href="#" class="fa fa-commenting-o">{{ article.comment_count }}</a>
+                 <a href="" class="fa fa-thumbs-up">{{ article.up_count }}</a>
+                 <a href="" class="fa fa-thumbs-down">{{ article.dowm_count }}</a>
+             </div>
+         </div>
+         {% endfor %}
+         <nav aria-label="Page navigation">
+            <ul class="pagination">
+            {{ dict.page_info.pager|safe}}
+            </ul>
+         </nav>
+     </div>
+
+     <div class="col-md-4">
+         <div class="panel panel-default">
+             <div class="panel-heading">强力推荐</div>
+             {% for row in dict.up_article_list %}
+             <div class="panel-body"><a href="{% url 'article' row.blog.site row.aid %}">{{ row.title }}</a></div>
+             {% endfor %}
+</div>
+         <div class="panel panel-default">
+             <div class="panel-heading">评论最多的文章</div>
+             {% for row in dict.comment_article_list %}
+             <div class="panel-body"><a href="{% url 'article' row.blog.site row.aid %}">{{ row.title }}</a></div>
+             {% endfor %}
+
+</div>
+     </div>
+</div>
+</body>
+</html>

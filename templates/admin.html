@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <style>
+        .condition a{
+            margin: 10px;
+            color: blue;
+        }
+        .active{
+            background-color: #2e6da4;
+        }
+    </style>
+</head>
+<body>
+<div class="condition">
+<div>
+    总分类
+        {% if dict.kwargs.type == 0 %}
+        <a class="active" href="/admin-0-{{ dict.kwargs.classfiy_id }}-{{ dict.kwargs.article_tag__tag_id }}.html">全部</a>
+         {% else %}
+         <a href="/admin-0-{{ dict.kwargs.classfiy_id }}-{{ dict.kwargs.article_tag__tag_id }}.html">全部</a>
+         {% endif %}
+    {% for foo in dict.type_list %}
+        {% if foo.0 == dict.kwargs.type %}
+        <a class="active" href="/admin-{{ foo.0 }}-{{ dict.kwargs.classfiy_id }}-{{ dict.kwargs.article_tag__tag_id }}.html">{{ foo.1 }}</a>
+        {% else %}
+        <a href="/admin-{{ foo.0 }}-{{ dict.kwargs.classfiy_id }}-{{ dict.kwargs.article_tag__tag_id }}.html">{{ foo.1 }}</a>
+        {% endif %}
+    {% endfor %}
+</div>
+<div>
+    个人分类
+         {% if dict.kwargs.classfiy_id == 0 %}
+             <a class="active" href="/admin-{{ dict.kwargs.type }}-0-{{ dict.kwargs.article_tag__tag_id }}.html">全部</a>
+         {% else %}
+             <a href="/admin-{{ dict.kwargs.type }}-0-{{ dict.kwargs.article_tag__tag_id }}.html">全部</a>
+         {% endif %}
+    {% for foo in dict.classfiy_list %}
+        {% if foo.id == dict.kwargs.classfiy_id %}
+            <a class="active" href="/admin-{{ dict.kwargs.type }}-{{ foo.id }}-{{ dict.kwargs.article_tag__tag_id }}.html">{{ foo.classfiy }}</a>
+        {% else %}
+            <a href="/admin-{{ dict.kwargs.type }}-{{ foo.id }}-{{ dict.kwargs.article_tag__tag_id }}.html">{{ foo.classfiy }}</a>
+        {% endif %}
+    {% endfor %}
+</div>
+<div>
+    标签分类
+    {% if dict.kwargs.article_tag__tag_id == 0 %}
+        <a class="active" href="/admin-{{ dict.kwargs.type }}-{{ dict.kwargs.classfiy_id }}-0.html">全部</a>
+    {% else %}
+        <a href="/admin-{{ dict.kwargs.type }}-{{ dict.kwargs.classfiy_id }}-0.html">全部</a>
+    {% endif %}
+    {% for foo in dict.tag_list %}
+        {% if foo.tid == dict.kwargs.article_tag__tag_id  %}
+            <a class="active" href="/admin-{{ dict.kwargs.type }}-{{ dict.kwargs.classfiy_id }}-{{ foo.tid }}.html">{{ foo.tag }}</a>
+        {% else %}
+            <a href="/admin-{{ dict.kwargs.type }}-{{ dict.kwargs.classfiy_id }}-{{ foo.tid }}.html">{{ foo.tag }}</a>
+        {% endif %}
+    {% endfor %}
+</div>
+</div>
+<div class="article_list">
+    {% for row in dict.article_list %}
+    <div>{{ row.title }}</div>
+    {% endfor %}
+
+</div>
+</body>
+</html>

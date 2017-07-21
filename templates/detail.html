@@ -1,0 +1,177 @@
+{% extends 'layout.html' %}
+
+{% block css %}
+    <style>
+    .comment{
+        margin-left: 30px;
+    }
+    </style>
+
+    <link rel="stylesheet" href="/static/css/theme/{{ dict.blog.theme }}.css">
+{% endblock %}
+{% block header %}
+  <div class="container theme">
+    <!-- Brand and toggle get grouped for better mobile display -->
+    <div class="navbar-header ">
+      <a class="navbar-brand" href="#">{{ dict.blog.title }}</a>
+    </div>
+
+    <!-- Collect the nav links, forms, and other content for toggling -->
+    <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+          <div class="userinfo right" style="line-height: 48px">
+             <a href="/">首页</a>
+             <a href="#">个人首页</a>
+             <a href="#">管理</a>
+         </div>
+
+    </div><!-- /.navbar-collapse -->
+  </div><!-- /.container-fluid -->
+{% endblock %}
+{% block nav %}
+         <div>
+      公告
+         <ul>
+            <li>昵称:{{ dict.user_list.nickname }}</li>
+             <li><a href="">粉丝:{{ dict.fans_count.0.xx }}</a></li>
+             <li><a href="">关注:{{ dict.focus_count.0.xx }}</a></li>
+             <li>邮箱:{{ dict.user_list.email }}</li>
+         </ul>
+      标签
+         <ul>
+              {% for key in dict.tag_dict %}
+                     <li><a href="{% url 'filter' dict.blog.site 'tag' key.tag_id %}">{{ key.tag__tag }}({{ key.xx }})</a></li>
+             {% endfor %}
+         </ul>
+      分类
+         <ul>
+            {% for k in dict.classfiy_dict %}
+               <li><a href="{% url 'filter' dict.blog.site 'classfiy' k.classfiy__id %}">{{ k.classfiy__classfiy }}({{ k.xx }})</a></li>
+            {% endfor %}
+         </ul>
+      时间
+         <ul>
+            {% for k in dict.date_list %}
+                <li><a href="{% url 'filter' dict.blog.site 'datetime' k.month %}">{{ k.month }}({{ k.num }})</a></li>
+            {% endfor %}
+         </ul>
+     </div>
+{% endblock %}
+{% block content %}
+     <div>
+          <h1>{{ article.article.title }}</h1>
+          <p>{{ article.content|safe }}</p>
+     </div>
+
+     <div class="footer">
+                 <a id="upper" style="padding: 5px;margin: 10px;" class="fa fa-thumbs-up fa-3x">{{ article.article.up_count }}</a>
+                 <a id="downner" style="padding: 5px;margin: 10px;" class="fa fa-thumbs-down fa-3x">{{ article.article.dowm_count }}</a>
+                 <a href="" class="fa fa-user-o">{{ article.article.blog.user.nickname }}</a>
+                 <span>发布于{{ article.article.create_time }}</span>
+                 <span>阅读数 {{ article.article.read_count }}</span>
+                 <a href="#" class="fa fa-commenting-o">{{ article.article.comment_count }}</a>
+     </div>
+    <div class="commentarea">
+
+        <h5>评论列表</h5>
+        {{ comment_str|safe }}
+    </div>
+
+{% endblock %}
+
+{% block js %}
+    <script>
+            $(function(){
+               $.ajax({
+                   url:'/comment.html',
+                   data:{'typename':{{ article.article.aid }},'csrfmiddlewaretoken':'{{ csrf_token }}'},
+                   type:'post',
+                   dataType:'JSON',
+                   success:function (data) {
+                        var comment=commentTree(data);
+                        $('.commentarea').append(comment)
+                   }
+               });
+        });
+{#                var nn =new Date;#}
+{#                nn.getDate() ;#}
+            /*
+            前端 调用对象方法时，是通过调用类的propotype中的方法
+            正则表达式：/\w+/g
+            字符串replace
+                 ''.replace(/(\w+)/g,function(k,kk){return 11})
+            */
+            String.prototype.Format=function(arg){
+                /*
+                this 当前字符串
+                arg  format方法传入的参数{key:value}
+                return 格式化之后获取的新内容
+                 */
+                var temp=this.replace(/\{(\w+)\}/g,function(k,kk){
+                    return arg[kk];
+                });
+                return temp;
+            };
+
+
+           function commentTree(comment_list){
+                var comment_str="<div class='comment'>";
+                $.each(comment_list,function(k,row){
+                    var temp="<div class='content'>{user}{content}---{time}</div>";
+                    var temp1=temp.Format({user:row.user__nickname,content:row.content,time:row.create_time});
+                    comment_str += temp1;
+                    if(row.child.length>0){
+                        comment_str += commentTree(row.child);
+                    }
+                });
+               comment_str += "</div>";
+               return comment_str
+           }
+
+
+
+
+       $('#upper').click(function () {
+
+           var id=$('#article_id').val();
+           $.ajax({
+               url:'/up.html',
+               data:{'id':id,'type':'Y','csrfmiddlewaretoken':'{{ csrf_token }}'},
+               type:'post',
+               dataType:'JSON',
+               success:function (data) {
+                   if(data['type']=='True'){
+                       alert(data['msg']);
+                       var count=$('#upper')[0].innerText;
+                       console.log(count);
+                       $('#upper')[0].innerText=parseInt(count)+1;
+                   }else{
+                       alert(data['msg'])
+                   }
+
+               }
+
+           })
+       });
+    $('#downner').click(function () {
+
+           var id=$('#article_id').val();
+           $.ajax({
+               url:'/up.html',
+               data:{'id':id,'type':'N','csrfmiddlewaretoken':'{{ csrf_token }}'},
+               type:'post',
+               dataType:'JSON',
+               success:function (data) {
+                   if(data['type']=='False'){
+                       alert(data['msg']);
+                       var count=$('#downner')[0].innerText;
+                       console.log(count);
+                       $('#downner')[0].innerText=parseInt(count)-1;
+                   }else{
+                       alert(data['msg'])
+                   }
+               }
+
+           })
+       })
+    </script>
+{% endblock %}

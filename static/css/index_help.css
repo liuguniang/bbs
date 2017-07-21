@@ -1,0 +1,20 @@
+.no-radio{
+    border-radius: 0 !important;
+}
+
+.left{
+    float: left;
+}
+.right{
+    float: right;
+}
+.container .col-md-8 .article{
+    margin: 20px;
+}
+.container .col-md-8 .article .art-body a img{
+    width: 70px;
+    height:70px;
+}
+.container .col-md-8 .article .art-footer a{
+    padding: 5px;
+}
