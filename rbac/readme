@@ -1,0 +1,15 @@
+
+使用手册
+
+1 注册app 'rbac'
+2 在登录成功后
+         导入函数permission_session，传入参数rbac的user表中的用户id,request
+         作用是在session中设置登录用户的权限
+3 引入中间件 'rbac.middleware.md.RbacMiddleWare',
+4 初始化数据库
+5 需要菜单时：
+         导入函数menu  传入参数用户id，当前访问url
+              返回与用户相关的菜单(mark_safe)
+         导入相关css和js函数，返回字符串
+6 可以更改rbac组件的conf文件,设置项目的url白名单,符合此白名单的url不需要经过用户权限验证
+

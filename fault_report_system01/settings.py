@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'knowlage01',
     'app02',
+    'rbac',
 ]
 
 MIDDLEWARE = [
@@ -49,7 +50,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    # 'middleware.md.M1',
+    'rbac.middleware.md.RbacMiddleWare',
 ]
 
 ROOT_URLCONF = 'fault_report_system01.urls'

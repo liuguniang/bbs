@@ -5,6 +5,14 @@
     .comment{
         margin-left: 30px;
     }
+    #i1{
+        display: inline-block;
+        width:100px;
+        height:50px;
+    }
+    .hide{
+        display: none;
+    }
     </style>
 
     <link rel="stylesheet" href="/static/css/theme/{{ dict.blog.theme }}.css">
@@ -60,6 +68,7 @@
      <div>
           <h1>{{ article.article.title }}</h1>
           <p>{{ article.content|safe }}</p>
+         <input type="text" id="article_id" value="{{ article.article.aid }}" style="display: none;">
      </div>
 
      <div class="footer">
@@ -73,14 +82,35 @@
     <div class="commentarea">
 
         <h5>评论列表</h5>
-        {{ comment_str|safe }}
+{#        <div>{{ comment_str|safe }}</div>#}
+
+    </div>
+    <div class="commentarea2">
+        <h4>发表评论</h4>
+        <form  novalidate>
+             昵称：
+             <input type="text" value="{{ dict.username }}" class="hide i1">
+             <input type="text" value="" class="hide i2">
+             <textarea id="content"></textarea>
+             <input id='i3' type="submit" value="提交评论">
+             <a href="/exit/" class="hide a1">退出</a>
+             <a href="/login/" class="hide a2">登录</a>
+        </form>
     </div>
 
 {% endblock %}
 
 {% block js %}
+    <script src="/static/kindeditor-4.1.10/kindeditor-all.js"></script>
     <script>
-            $(function(){
+    $(function(){
+               if($('.i1').val()=='None'){
+                   $('.i2').removeClass('hide');
+                   $('.a2').removeClass('hide');
+               }else{
+                   $('.i1').removeClass('hide');
+                   $('.a1').removeClass('hide');
+               }
                $.ajax({
                    url:'/comment.html',
                    data:{'typename':{{ article.article.aid }},'csrfmiddlewaretoken':'{{ csrf_token }}'},
@@ -100,7 +130,7 @@
             字符串replace
                  ''.replace(/(\w+)/g,function(k,kk){return 11})
             */
-            String.prototype.Format=function(arg){
+    String.prototype.Format=function(arg){
                 /*
                 this 当前字符串
                 arg  format方法传入的参数{key:value}
@@ -112,8 +142,7 @@
                 return temp;
             };
 
-
-           function commentTree(comment_list){
+    function commentTree(comment_list){
                 var comment_str="<div class='comment'>";
                 $.each(comment_list,function(k,row){
                     var temp="<div class='content'>{user}{content}---{time}</div>";
@@ -127,10 +156,7 @@
                return comment_str
            }
 
-
-
-
-       $('#upper').click(function () {
+    $('#upper').click(function () {
 
            var id=$('#article_id').val();
            $.ajax({
@@ -172,6 +198,33 @@
                }
 
            })
-       })
+       });
+
+    KindEditor.create('#content',{
+        width:'50%',
+        height:'50px',
+        resizeType:0,
+        items:['source','indent','bold','image','link'],
+        filePostName:'fafafa',
+        uploadJson:'/upload_img.html',
+        extraFileUploadParams:{'csrfmiddlewaretoken':'{{ csrf_token }}'},
+        afterBlur: function(){this.sync();}
+    });
+
+    $('#i3').click(function(){
+        var comment=$('#content').val();
+        alert(comment);
+        var article_id=$('#article_id').val();
+        $.ajax({
+            url:'/add_comment.html',
+            type:'post',
+            data:{'username':'{{ dict.username }}','article_id':article_id,'comment':comment,'csrfmiddlewaretoken':'{{ csrf_token }}'},
+            dataType:'JSON',
+            success:function (data) {
+                alert(data);
+                location.reload();
+            }
+        })
+    })
     </script>
 {% endblock %}

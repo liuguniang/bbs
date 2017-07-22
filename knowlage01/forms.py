@@ -3,6 +3,7 @@
 from django.core.exceptions import ValidationError
 from django.forms import Form,widgets,fields
 from knowlage01 import models
+from bs4 import BeautifulSoup
 
 class registerForm(Form):
 
@@ -45,9 +46,9 @@ class new_articleForm(Form):
     type=fields.IntegerField(
         widget=widgets.Select(choices=tuple(models.article.type_choice))
     )
-    classfiy=fields.MultipleChoiceField(
+    classfiy_id=fields.ChoiceField(
         # choices=tuple(models.classfiy.objects.filter().values_list('id','classfiy')),
-        widget=widgets.CheckboxSelectMultiple
+        widget=widgets.Select
     )
     tag=fields.MultipleChoiceField(
         # choices=tuple(models.tag.objects.values_list('tid','tag')),
@@ -58,5 +59,25 @@ class new_articleForm(Form):
         self.request=request
         username = self.request.session.get('username')
         blog = models.blog.objects.filter(user__username=username)
-        self.fields['classfiy'].choices=tuple(models.classfiy.objects.filter(blog=blog).values_list('id','classfiy'))
+        self.fields['classfiy_id'].choices=tuple(models.classfiy.objects.filter(blog=blog).values_list('id','classfiy'))
         self.fields['tag'].choices=tuple(models.tag.objects.filter(blog=blog).values_list('tid','tag'))
+    def clean_content(self):
+        valid_tag = {
+            'p': ['class', 'id'],
+            'img': ['href', 'alt', 'src'],
+            'div': ['class']
+        }
+        content=self.cleaned_data['content']
+        soup = BeautifulSoup(content, 'html.parser')
+
+        tags = soup.find_all()
+        for tag in tags:
+            if tag.name not in valid_tag:
+                tag.decompose()
+            if tag.attrs:
+                for k in list(tag.attrs.keys()):
+                    if k not in valid_tag[tag.name]:
+                        del tag.attrs[k]
+
+        content_str = soup.decode()
+        return content_str

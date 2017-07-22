@@ -35,7 +35,7 @@ urlpatterns = [
     url(r'^upload_img.html$',views.upload_img),
     url(r'^see_article.html$',views.see_article),
 
-
+    url(r'^add_comment.html',views.add_comment),
     url(r'^up.html$',views.up),
     url(r'^comment.html$',views.comment),
     url(r'^(?P<site>\w*).html$',views.home,name='index'),

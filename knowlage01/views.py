@@ -13,7 +13,7 @@ from utils.xss import xss
 #主页面
 def index(request,*args,**kwargs):
     # 获取当前URL
-    # print(request.path_info)
+    print(request.path_info)
 
     # models.article.objects.create(blog_id=1,title='世界上最好看的花',summary='新浪微博网民“白衣天使茉莉花”公布了一张照片。照片中，在破旧校门前，一个小女孩举着“遭性侵”的求助标语，地点是河南省周口市西华县奉母镇一中。',read_count=9,up_count=3,dowm_count=5,comment_count=8,classfiy_id=1,type=1)
 
@@ -273,8 +273,9 @@ def home(request,**kwargs):
     return render(request,'home.html',{'page_info':page_info,'all_article_list': all_article_list,'dict':dict})
 #文章最终页
 def article(request,**kwargs):
-    site=kwargs.get('site')
-    typename=kwargs.get('typename')
+    site=kwargs.get('site')  #博客后缀
+    typename=kwargs.get('typename')  #文章id
+    username=request.session.get('username') #当前登录用户
     user_list=models.user.objects.filter(blog__site=site).first()
     blog=models.blog.objects.filter(site=site).first()
     fans_count=models.fans.objects.filter(faned__blog__site=site).values('faned__username').annotate(xx=Count('id'))
@@ -292,6 +293,7 @@ def article(request,**kwargs):
         'focus_count':focus_count,
         'blog':blog,
         'date_list':date_list,
+        'username':username,
     }
     article = models.content.objects.filter(article_id=int(typename)).first()
     comment_list = models.comment.objects.filter(article_id=int(typename)).values('id', 'create_time', 'content',
@@ -372,6 +374,15 @@ def up(request):
     else:
         status['msg']='请先登录'
         return HttpResponse(json.dumps(status))
+#提交评论
+def add_comment(request):
+    comment=request.POST.get('comment')
+    article_id=request.POST.get('article_id')
+    username=request.POST.get('username')
+    user=models.user.objects.filter(username=username).first()
+    models.comment.objects.create(**{'content':comment,'article_id':article_id,'user_id':user.uid})
+    return HttpResponse(json.dumps('评论成功'))
+
 # 后台管理
 def admin(request,**kwargs):
     #组合筛选条件
@@ -415,9 +426,20 @@ def new_article(request):
         # CONTENT = content
         if obj.is_valid():
             article_list=obj.cleaned_data
-            print(article_list)
+            content=article_list.pop('content')
+            tag_list=article_list.pop('tag')
+            #文章表添加
+            username=request.session.get('username')
+            blog_id=models.blog.objects.filter(user__username=username).values('bid')
+            article_list['blog_id']=blog_id[0]['bid']
+            #获取新添加文章表的自增id
+            obj=models.article.objects.create(**article_list)
+            #文章详细表添加，文章标签关系表添加
+            models.content.objects.create(**{'content':content,'article_id':obj.aid})
+            for i in tag_list:
+                models.article_tag.objects.create(**{'article_id':obj.aid,'tag_id':int(i)})
 
-            return HttpResponse('上传文章成功')
+            return render(request,'see_article.html',{'content':content})
         else:
             return render(request, 'new_article.html', {'obj': obj})
 #查看新随笔的内容（beautifulsoup过滤）

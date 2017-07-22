@@ -56,10 +56,10 @@ class article(models.Model):
     title=models.CharField(verbose_name='文章题目',max_length=64)
     summary=models.CharField(verbose_name='文章摘要',max_length=225)
     create_time=models.DateTimeField(verbose_name='发布时间',auto_now_add=True)
-    read_count=models.IntegerField(verbose_name='阅读数')
-    comment_count=models.IntegerField(verbose_name='评论数')
-    up_count=models.IntegerField(verbose_name='点赞数',null=True)
-    dowm_count=models.IntegerField(verbose_name='点踩数',null=True)
+    read_count=models.IntegerField(verbose_name='阅读数',default=0)
+    comment_count=models.IntegerField(verbose_name='评论数',default=0)
+    up_count=models.IntegerField(verbose_name='点赞数',null=True,default=0)
+    dowm_count=models.IntegerField(verbose_name='点踩数',null=True,default=0)
     blog = models.ForeignKey(verbose_name='所属博客', to='blog', to_field='bid')
     classfiy=models.ForeignKey(verbose_name='分类',to='classfiy',to_field='id',null=True)
     type_choice=[
@@ -70,8 +70,8 @@ class article(models.Model):
     ]
     type=models.IntegerField(verbose_name='类型',choices=type_choice,default=None)
 
-    def __str__(self):
-        return "%s-%s"%(self.blog.title,self.title)
+    # def __str__(self):
+    #     return "%s-%s"%(self.blog.title,self.title)
 
 class article_tag(models.Model):
     article=models.ForeignKey(to='article',to_field='aid',null=True)

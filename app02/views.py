@@ -2,22 +2,17 @@ from django.shortcuts import render
 from django.shortcuts import HttpResponse
 from app02 import models
 import re
+from rbac.services import permission_session
+from rbac import models as rbacmodels
 
 
 def login(request):
     if request.method=='GET':
         return render(request,'login2.html')
     else:
-        permission_list=models.Permission2Action2Role.objects.filter(role__users__user_id=1).values('permission__url','action__code').distinct()
-
-        dict = {}
-        for obj in permission_list:
-            dict[obj['permission__url']]=[]
-        for row in permission_list:
-            if row['permission__url'] in dict.keys():
-                dict[row['permission__url']].append(row['action__code'])
-    #{'/orders.html': ['get'], '/blogs.html': ['get', 'post'], '/users.html': ['post', 'get', 'edit', 'del']}
-        request.session['permission']=dict
+        #获取用户输入的用户名，密码等，验证成功后，根据用户名在rbac的user表中找到对应的user_id
+        obj=rbacmodels.User.objects.filter(username='alex').first()
+        permission_session(obj.id,request)
         return HttpResponse('登录成功')
 
 def index(request):
