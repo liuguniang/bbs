@@ -122,8 +122,7 @@
                    }
                });
         });
-{#                var nn =new Date;#}
-{#                nn.getDate() ;#}
+
             /*
             前端 调用对象方法时，是通过调用类的propotype中的方法
             正则表达式：/\w+/g
@@ -168,7 +167,6 @@
                    if(data['type']=='True'){
                        alert(data['msg']);
                        var count=$('#upper')[0].innerText;
-                       console.log(count);
                        $('#upper')[0].innerText=parseInt(count)+1;
                    }else{
                        alert(data['msg'])
@@ -190,7 +188,6 @@
                    if(data['type']=='False'){
                        alert(data['msg']);
                        var count=$('#downner')[0].innerText;
-                       console.log(count);
                        $('#downner')[0].innerText=parseInt(count)-1;
                    }else{
                        alert(data['msg'])

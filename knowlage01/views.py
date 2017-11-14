@@ -13,7 +13,7 @@ from utils.xss import xss
 #主页面
 def index(request,*args,**kwargs):
     # 获取当前URL
-    print(request.path_info)
+    # print(request.path_info)
 
     # models.article.objects.create(blog_id=1,title='世界上最好看的花',summary='新浪微博网民“白衣天使茉莉花”公布了一张照片。照片中，在破旧校门前，一个小女孩举着“遭性侵”的求助标语，地点是河南省周口市西华县奉母镇一中。',read_count=9,up_count=3,dowm_count=5,comment_count=8,classfiy_id=1,type=1)
 
@@ -63,6 +63,7 @@ def login(request):
             nickname=request.POST.get('username')
             password=int(request.POST.get('password'))
             obj=models.user.objects.filter(nickname=nickname).first()
+
             if obj.nickname==nickname and obj.password==password:
                 request.session['username']=nickname
                 return redirect('/')
@@ -283,8 +284,8 @@ def article(request,**kwargs):
     tag_dict=models.article_tag.objects.filter(tag__blog__site=site).values('tag_id','tag__tag').annotate(xx=Count('id'))
     classfiy_dict=models.article.objects.filter(blog=blog).values('classfiy__id','classfiy__classfiy').annotate(xx=Count('aid'))
     #取日期分类
-    select={'month':'strftime("%%Y-%%m",create_time)'}
-    date_list=models.article.objects.filter(blog=blog).extra(select=select).values('month').annotate(num=Count('aid'))
+    select = {'month': 'strftime("%%Y-%%m",create_time)'}
+    date_list = models.article.objects.filter(blog=blog).extra(select=select).values('month').annotate(num=Count('aid'))
     dict={
         'user_list':user_list,
         'tag_dict':tag_dict,
